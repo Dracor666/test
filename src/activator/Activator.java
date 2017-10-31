@@ -3,9 +3,11 @@
  */
 package activator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-import brainSim.GreyMatrix;
+import brainSim.*;
 import shufler.DeckDecoder;
 
 /**
@@ -24,8 +26,69 @@ public class Activator {
 		
 		//deckDecoderTest();
 		//biasedRandomTest();
-		brainSimTest();
+		//brainSimTest();
+		brainSimConnectionTest();
 		
+	}
+	
+	private static void brainSimConnectionTest() {
+		int t = 20;
+		boolean xdotx = true;
+		boolean [][] left, right, border;
+		
+		border = new boolean[][]{{false,false,false,false}
+								,{false,false,false,false}
+								,{false,false,false,false}
+								,{false,false,false,false}
+								,{false,false,false,false}
+								,{false,false,false,false}
+								,{false,false,false,false}};
+		left = new boolean[][]{{false,false,false,false,false,false,false,false}
+							  ,{xdotx,false,false,xdotx,false,false,false,false}
+							  ,{false,false,false,false,xdotx,false,false,false}
+							  ,{xdotx,false,false,false,xdotx,false,false,false}
+							  ,{false,xdotx,xdotx,xdotx,xdotx,false,false,false}
+							  ,{false,false,false,false,false,false,false,false}
+							  ,{false,false,false,false,false,false,false,false}};							  
+		right = new boolean[][]{{false,false,false,false,false,false,false,false}
+							   ,{false,false,false,false,xdotx,false,false,xdotx}
+							   ,{false,false,false,xdotx,false,false,false,false}
+							   ,{false,false,false,xdotx,false,false,false,xdotx}
+							   ,{false,false,false,xdotx,xdotx,xdotx,xdotx,false}
+							   ,{false,false,false,false,false,false,false,false}
+							   ,{false,false,false,false,false,false,false,false}};
+		
+							  
+		GreyMatrix leftPart = new GreyMatrix(left);
+		GreyMatrix rightPart = new GreyMatrix(right);
+		GreyMatrix noZone = new GreyMatrix(border);
+		List<GreyCell> updater;
+		
+		leftPart.connect2Right(rightPart);
+		leftPart.connect(noZone);
+
+		updater = new ArrayList<>();
+		updater.addAll(leftPart.getFullMatrix());
+		updater.addAll(rightPart.getFullMatrix());
+		updater.addAll(noZone.getFullMatrix());
+		
+		for(int i = 0; i < t; i++) {
+			System.out.println("\n:" + i + ":");
+			
+			for(GreyCell cell: updater) {
+				cell.recalcState();
+			}
+			for(GreyCell cell: updater) {
+				cell.revealCalc();
+			}
+			
+			String[] leftCanvas = leftPart.project();
+			String[] rightCanvas = rightPart.project();
+			String[] no = noZone.project();
+			for(int x = 0; x < leftCanvas.length; x++) {
+				System.out.println(leftCanvas[x] +"|" + rightCanvas[x] + ":" + no[x]);
+			}
+		}
 	}
 	
 	private static void brainSimTest() {

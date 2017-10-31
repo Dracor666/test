@@ -9,18 +9,19 @@ package brainSim;
  */
 public class GreyCell {
 
+	private int life;
 	private int[] birth, keep;
 	private boolean state, hidden;
 	private GreyCell[] neighbours;
 	
 	public GreyCell() {
 		state = false;
-		lookAround();
+		coreSetup();
 	}
 	
 	public GreyCell(boolean fromMemory) {
 		state = fromMemory;
-		lookAround();
+		coreSetup();
 	}
 	
 	public void recalcState() {
@@ -33,11 +34,14 @@ public class GreyCell {
 		
 		if(state && rulesCheck(keep, totalNeighbours)) {
 			hidden = true;
-		} else 
-			if(!state && rulesCheck(birth, totalNeighbours))
-				hidden = true;
-			else
-				hidden = false;
+			life++;
+		} else if(!state && rulesCheck(birth, totalNeighbours)) {
+			hidden = true;
+			life = 1;
+		} else {
+			hidden = false;
+			life = 0;
+		}
 		
 	}	
 	
@@ -46,7 +50,19 @@ public class GreyCell {
 	}
 	
 	public void setNeighbours(GreyCell[] neighbours) {
+		if(neighbours.length != 8)
+			return;
+		
 		this.neighbours = neighbours;
+	}
+	
+	public void updateNeighbours(GreyCell[] neighbours) {
+		if(neighbours.length != 8)
+			return;
+		
+		for(int i = 0; i < this.neighbours.length; i++)
+			if(neighbours[i] != null)
+				this.neighbours[i] = neighbours[i];
 	}
 	
 	public boolean getState() {
@@ -58,10 +74,11 @@ public class GreyCell {
 		return Boolean.toString(state);
 	}
 
-	private void lookAround() {
+	private void coreSetup() {
 		neighbours = new GreyCell[8];
 		birth = new int[] {3};
 		keep = new int[] {2,3};
+		life = 0;
 	}
 	
 	private boolean rulesCheck(int[] rulesSet, int foundTotal) {
